@@ -1,11 +1,11 @@
 # Elastic Stack 
 ## Deploy a Multi-Node Elasticsearch Cluster
-1. Install Elasticsearch with Debian Package on each node.
+### 1. Install Elasticsearch with Debian Package on each node.
 
 Import the Elastic GPG key
 ```
-$ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -`
-``
+$ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+```
 
 Installing form the APT repository
 ```
@@ -24,8 +24,10 @@ $ sudo /bin/systemctl daemon-reload
 $ sudo /bin/systemctl enable elasticsearch.service
 ```
 
-2. Configure each node's elasticsearch.yml
-` $ sudo vim /etc/elasticsearch/elasticsearch.yml`
+### 2. Configure each node's elasticsearch.yml
+```
+$ sudo vim /etc/elasticsearch/elasticsearch.yml
+```
 
 Change the following line on elastic-master-1:
 ```
