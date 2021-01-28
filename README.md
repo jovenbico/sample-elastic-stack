@@ -1,57 +1,72 @@
 # Elastic Stack 
+## Deploy a Multi-Node Elasticsearch Cluster
+1. Install Elasticsearch with Debian Package on each node.
 
-## Installation  
-
-### Import Key  
-
-Download and install the public signing key:  
-
+Import the Elastic GPG key
 ```
-$ sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+$ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -`
+``
+
+Installing form the APT repository
 ```
-
-### Install RPM repository  
-
-Create a file called elasticsearch.repo in the /etc/yum.repos.d/ directory for RedHat based distributions
-
-```
-[elasticsearch-7.x]
-name=Elasticsearch repository for 7.x packages
-baseurl=https://artifacts.elastic.co/packages/7.x/yum
-#baseurl=https://artifacts.elastic.co/packages/oss-7.x/yum
-gpgcheck=1
-gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-enabled=1
-autorefresh=1
-type=rpm-md
+$ sudo apt-get install apt-transport-https
+$ echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
 ```
 
-### Install  ELK  
+Install Elasticsearch:
 ```
-sudo yum install elasticsearch
-sudo yum install logstash
-sudo yum install kibana
+$ sudo apt-get update && sudo apt-get install elasticsearch
 ```
 
-### Start services  
+Configure Elasticsearch to start on system boot:
 ```
-sudo service elasticsearch start
-sudo service logstash start
-sudo service kibana start
-```
-### Open firewall
-https://www.thegeekdiary.com/how-to-open-a-ports-in-centos-rhel-7/  
-```
-sudo firewall-cmd --zone=public --add-port=9200/tcp --permanent
-sudo firewall-cmd --zone=public --add-port=5601/tcp --permanent
-sudo firewall-cmd --reload
+$ sudo /bin/systemctl daemon-reload
+$ sudo /bin/systemctl enable elasticsearch.service
 ```
 
-### Check services  
-```
-# elasticsearch
-curl -X GET "localhost:9200/?pretty"
+2. Configure each node's elasticsearch.yml
+` $ sudo vim /etc/elasticsearch/elasticsearch.yml`
 
-# kibana
-curl -X GET "localhost:5601/app/kibana"
+Change the following line on elastic-master-1:
+```
+cluster.name: cluster-1
+node.name: master-1
+network.host: [_local_, _site_]
+discovery.seed_hosts: ["172.16.2.10"] # elastic-master-1 private IP
+cluster.initial_master_nodes: ["master-1"]
+# add lines below
+node.master: true
+node.data: false
+node.ingest: false
+node.ml: false
+```
+
+Change the following line on elastic-data-1:
+```
+cluster.name: cluster-1
+node.name: data-1
+network.host: [_local_, _site_]
+discovery.seed_hosts: ["172.16.2.10"] # elastic-master-1 private IP
+cluster.initial_master_nodes: ["master-1"]
+node.attr.temp: hot
+# add lines below
+node.master: false
+node.data: true
+node.ingest: true
+node.ml: false
+```
+
+Change the following line on elastic-data-2:
+```
+cluster.name: cluster-1
+node.name: data-2
+network.host: [_local_, _site_]
+discovery.seed_hosts: ["172.16.2.10"] # elastic-master-1 private IP
+cluster.initial_master_nodes: ["master-1"]
+node.attr.temp: warm
+# add lines below
+node.master: false
+node.data: true
+node.ingest: true
+node.ml: false
 ```
