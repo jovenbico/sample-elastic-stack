@@ -72,3 +72,29 @@ node.data: true
 node.ingest: true
 node.ml: false
 ```
+
+### 3. Configure the heap of each node
+```
+$ sudo vim /etc/elasticsearch/jvm.options
+```
+
+Change the following line on elastic-master-1:
+```
+-Xms768m
+-Xmx768m
+```
+
+Change the following line on elastic-data-1 and data-2:
+```
+-Xms2g
+-Xmx2g
+```
+
+### 4. Start Elasticsearch on each node
+```
+$ sudo systemctl start elasticsearch
+## Check the startup process:
+$ sudo tail -f /var/log/elasticsearch/cluster-1.log
+## Check the node configuration:
+$ curl localhost:9200/_cat/nodes?v
+```
