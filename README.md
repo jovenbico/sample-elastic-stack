@@ -155,6 +155,28 @@ PUT _cluster/settings
 
 ### 2. From Kibana, navigate to the "Stack Monitoring" application and explore the monitoring data.
 
+## Set Built-in User Passwords
+### 1. Setup passwords.
+```
+$ sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords interactive
+[Enter password]: elastic2021
+```
+
+### 2. Configure Kibana.
+```
+$ sudo vi /etc/kibana/kibana.yml
+```
+Change the following line on Kibana:
+```
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "elastic2021"
+```
+
+### 3. Restart Kibana.
+```
+$ sudo systemctl restart kibana
+```
+
 ## Encrypt the Elasticsearch Transport Network
 In order to secure the two main Elasticsearch networks (transport and client), we first need to create certificates for each Elasticsearch node. Moreover, these certificate need to have a chain of trust such that each node certificate trusts the other.
 
@@ -226,29 +248,6 @@ xpack.security.transport.ssl.truststore.path: cert_data-2.p12
 ```
 $ sudo systemctl restart elasticsearch
 ```
-
-## Set Built-in User Passwords
-### 1. Setup passwords.
-```
-$ sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords interactive
-[Enter password]: elastic2021
-```
-
-### 2. Configure Kibana.
-```
-$ sudo vi /etc/kibana/kibana.yml
-```
-Change the following line on Kibana:
-```
-elasticsearch.username: "kibana_system"
-elasticsearch.password: "elastic2021"
-```
-
-### 3. Restart Kibana.
-```
-$ sudo systemctl restart kibana
-```
-
 ## Encrypt the Elasticsearch Client Network
 ### 1. Configure client network encryption.
 ```
