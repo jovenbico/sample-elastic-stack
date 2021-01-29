@@ -164,7 +164,7 @@ $ sudo su -
 $ /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out /etc/elasticsearch/ca --pass elastic_ca
 ```
 
-### 2. Create certificates for each Elasticsearch node
+### 2. Create certificates for each Elasticsearch node.
 ```
 $ sudo su -
 
@@ -189,35 +189,35 @@ root@elastic-data-2$ chmod 640 /etc/elasticsearch/cert_data-2.p12
 $ sudo vi /etc/elasticsearch/elasticsearch.yml
 ```
 
-Add the following lines on elastic-master-1
+Add the following line on elastic-master-1:
 ```
 # --------------------------------- Security -----------------------------------
 #
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
-xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.verification_mode: full
 xpack.security.transport.ssl.keystore.path: cert_master-1.p12
 xpack.security.transport.ssl.truststore.path: cert_master-1.p12
 ```
 
-Add the following lines on elastic-data-1
+Add the following line on elastic-data-1:
 ```
 # --------------------------------- Security -----------------------------------
 #
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
-xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.verification_mode: full
 xpack.security.transport.ssl.keystore.path: cert_data-1.p12
 xpack.security.transport.ssl.truststore.path: cert_data-1.p12
 ```
 
-Add the following lines on elastic-data-2
+Add the following line on elastic-data-2:
 ```
 # --------------------------------- Security -----------------------------------
 #
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
-xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.verification_mode: full
 xpack.security.transport.ssl.keystore.path: cert_data-2.p12
 xpack.security.transport.ssl.truststore.path: cert_data-2.p12
 ```
@@ -226,4 +226,71 @@ xpack.security.transport.ssl.truststore.path: cert_data-2.p12
 ```
 $ sudo systemctl restart elasticsearch
 ```
+
+## Set Built-in User Passwords
+### 1. Setup passwords.
+```
+$ sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords interactive
+[Enter password]: elastic2021
+```
+
+### 2. Configure Kibana.
+```
+$ sudo vi /etc/kibana/kibana.yml
+```
+Change the following line on Kibana:
+```
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "elastic2021"
+```
+
+### 3. Restart Kibana.
+```
+$ sudo systemctl restart kibana
+```
+
 ## Encrypt the Elasticsearch Client Network
+### 1. Configure client network encryption.
+```
+$ sudo vi /etc/elasticsearch/elasticsearch.yml
+```
+
+Add the following line on elastic-master-1:
+```
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.keystore.path: cert_master-1.p12
+xpack.security.http.ssl.truststore.path: cert_master-1.p12
+```
+
+Add the following line on elastic-data-1:
+```
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.keystore.path: cert_data-1.p12
+xpack.security.http.ssl.truststore.path: cert_data-1.p12
+```
+
+Add the following line on elastic-data-2:
+```
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.keystore.path: cert_data-2.p12
+xpack.security.http.ssl.truststore.path: cert_data-2.p12
+```
+
+### 2. Restart Elasticsearch on each node.
+```
+$ sudo systemctl restart elasticsearch
+```
+### 3. Configure Kibana.
+```
+$ sudo vi /etc/kibana/kibana.yml
+```
+
+Change the following line on Kibana:
+```
+elasticsearch.hosts: ["https://localhost:9200"]
+elasticsearch.ssl.verificationMode: none
+```
+### 4. Restart Kibana.
+```
+$ sudo systemctl restart kibana
+```
