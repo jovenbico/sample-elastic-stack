@@ -178,7 +178,8 @@ $ sudo systemctl restart kibana
 ```
 
 ## Encrypt the Elasticsearch Transport Network
-In order to secure the two main Elasticsearch networks (transport and client), we first need to create certificates for each Elasticsearch node. Moreover, these certificate need to have a chain of trust such that each node certificate trusts the other.
+In order to secure the two main Elasticsearch networks (transport and client), we first need to create certificates for each Elasticsearch node. Moreover, these certificate need to have a chain of trust such that each node certificate trusts the other.  
+Check elastic.co guide! [elasticsearch-certutil](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/certutil.html)
 
 ### 1. Create a Certificate Authority (CA) which we will use to generate and sign individual node certificates for each Elasticsearch node.
 ```
