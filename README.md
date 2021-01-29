@@ -156,4 +156,74 @@ PUT _cluster/settings
 ### 2. From Kibana, navigate to the "Stack Monitoring" application and explore the monitoring data.
 
 ## Encrypt the Elasticsearch Transport Network
+In order to secure the two main Elasticsearch networks (transport and client), we first need to create certificates for each Elasticsearch node. Moreover, these certificate need to have a chain of trust such that each node certificate trusts the other.
+
+### 1. Create a Certificate Authority (CA) which we will use to generate and sign individual node certificates for each Elasticsearch node.
+```
+$ sudo su -
+$ /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out /etc/elasticsearch/ca --pass elastic_ca
+```
+
+### 2. Create certificates for each Elasticsearch node
+```
+$ sudo su -
+
+$ /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca /etc/elasticsearch/ca --name master-1 --dns elastic-master-1 --ip 172.16.2.10 --out /etc/elasticsearch/cert_master-1.p12
+$ /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca /etc/elasticsearch/ca --name data-1 --dns elastic-data-1 --ip 172.16.2.11 --out /etc/elasticsearch/cert_data-1.p12
+$ /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca /etc/elasticsearch/ca --name data-2 --dns elastic-data-2 --ip 172.16.2.12 --out /etc/elasticsearch/cert_data-2.p12
+
+## copy the cert to each node ##
+$ scp cert_data-1.p12 vagrant@172.16.2.11:/tmp/
+$ scp cert_data-2.p12 vagrant@172.16.2.12:/tmp/
+
+## move the cert to /etc/elasticsearch directory
+root@elastic-data-1$ mv /tmp/cert_data-1.p12 /etc/elasticsearch/
+root@elastic-data-1$ chmod 640 /etc/elasticsearch/cert_data-1.p12
+
+root@elastic-data-2$ mv /tmp/cert_data-2.p12 /etc/elasticsearch/
+root@elastic-data-2$ chmod 640 /etc/elasticsearch/cert_data-2.p12
+```
+
+### 3. Configure transport network encryption.
+```
+$ sudo vi /etc/elasticsearch/elasticsearch.yml
+```
+
+Add the following lines on elastic-master-1
+```
+# --------------------------------- Security -----------------------------------
+#
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: cert_master-1.p12
+xpack.security.transport.ssl.truststore.path: cert_master-1.p12
+```
+
+Add the following lines on elastic-data-1
+```
+# --------------------------------- Security -----------------------------------
+#
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: cert_data-1.p12
+xpack.security.transport.ssl.truststore.path: cert_data-1.p12
+```
+
+Add the following lines on elastic-data-2
+```
+# --------------------------------- Security -----------------------------------
+#
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: cert_data-2.p12
+xpack.security.transport.ssl.truststore.path: cert_data-2.p12
+```
+
+### 4. Restart Elasticsearch on each node.
+```
+$ sudo systemctl restart elasticsearch
+```
 ## Encrypt the Elasticsearch Client Network
