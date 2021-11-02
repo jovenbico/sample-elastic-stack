@@ -245,11 +245,20 @@ xpack.security.transport.ssl.verification_mode: full
 xpack.security.transport.ssl.keystore.path: cert_data-2.p12
 xpack.security.transport.ssl.truststore.path: cert_data-2.p12
 ```
+### 4. Add secure pass on each node.
+```
+$ sudo su -
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.http.ssl.keystore.secure_password
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.http.ssl.truststore.secure_password
 
-### 4. Restart Elasticsearch on each node.
+elastic_ca
+```
+
+### 5. Restart Elasticsearch on each node.
 ```
 $ sudo systemctl restart elasticsearch
 ```
+
 ## Encrypt the Elasticsearch Client Network
 ### 1. Configure client network encryption.
 ```
@@ -277,11 +286,20 @@ xpack.security.http.ssl.keystore.path: cert_data-2.p12
 xpack.security.http.ssl.truststore.path: cert_data-2.p12
 ```
 
-### 2. Restart Elasticsearch on each node.
+### 2. Add secure pass on each node.
+```
+$ sudo su -
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.transport.ssl.keystore.secure_password
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.transport.ssl.truststore.secure_password
+
+elastic_ca
+```
+
+### 3. Restart Elasticsearch on each node.
 ```
 $ sudo systemctl restart elasticsearch
 ```
-### 3. Configure Kibana.
+### 4. Configure Kibana.
 ```
 $ sudo vi /etc/kibana/kibana.yml
 ```
@@ -291,7 +309,7 @@ Change the following line on Kibana:
 elasticsearch.hosts: ["https://localhost:9200"]
 elasticsearch.ssl.verificationMode: none
 ```
-### 4. Restart Kibana.
+### 5. Restart Kibana.
 ```
 $ sudo systemctl restart kibana
 ```
