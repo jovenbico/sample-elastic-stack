@@ -248,8 +248,8 @@ xpack.security.transport.ssl.truststore.path: cert_data-2.p12
 ### 4. Add secure pass on each node.
 ```
 $ sudo su -
-$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.http.ssl.keystore.secure_password
-$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.http.ssl.truststore.secure_password
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.transport.ssl.keystore.secure_password
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.transport.ssl.truststore.secure_password
 
 elastic_ca
 ```
@@ -289,8 +289,8 @@ xpack.security.http.ssl.truststore.path: cert_data-2.p12
 ### 2. Add secure pass on each node.
 ```
 $ sudo su -
-$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.transport.ssl.keystore.secure_password
-$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.transport.ssl.truststore.secure_password
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.http.ssl.keystore.secure_password
+$ /usr/share/elasticsearch/bin/elasticsearch-keystore add xpack.security.http.ssl.truststore.secure_password
 
 elastic_ca
 ```
